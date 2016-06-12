@@ -46,16 +46,25 @@ GameScene.prototype = {
         this.startGame();
       }
     } else {
+      this.turnText.setText("PLAYER " + this.turn + " TURN");
       if(this.roundStatus == 'break'){
+        this.turnText.setText("PLAYER " + this.turn + " TURN \n PRESS SPACEBAR TO START");
         if(this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)){
           this.resumeRound();
         }
       }
+      //CHECK RESULT OF THE ROUND
       if(this.roundStatus == 'ended'){
-        // console.log("COUNT HERE");
+          if(this.turn == 1 && this.pow1 > this.pow2){
+            this.turnText.setText("PLAYER 1 WON");
+          } else if (this.turn == 2 && this.pow1 < this.pow2){
+            this.turnText.setText("PLAYER 2 WON");
+          } else {
+            this.turnText.setText("DRAW");
+            this.newRound();
+          }
       }
     }
-
   },
 
   render: function () {
@@ -67,7 +76,7 @@ GameScene.prototype = {
   },
 
   getPower: function(){
-    if(this.gameStarted){
+    if(this.gameStarted && this.roundStatus != 'ended'){
       switch (this.turn) {
         case 1:
           this.pow1++;
@@ -112,5 +121,13 @@ GameScene.prototype = {
   resumeRound: function(){
     this.roundStatus = 'resume';
     timer.resume();
+  },
+
+  newRound: function(){
+    this.pow1 = 0;
+    this.pow2 = 0;
+    this.round++;
+    this.roundStatus = 'started';
+    this.endTimer();
   }
 };
