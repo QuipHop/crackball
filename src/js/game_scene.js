@@ -1,6 +1,6 @@
 'use strict';
 
-var style = { font: "24px Arial", fill: "#FF0044", align: "center" };
+var style = { font: "3em comeback", fill: "#FF0044", align: "center" };
 
 var timer;
 var countDown = 5000;
@@ -34,7 +34,6 @@ GameScene.prototype = {
     this.p1ScoreLabel = this.game.add.text(0, 50, "SCORE " + this.pow1, style);
     this.p2ScoreLabel = this.game.add.text(this.game.world.width, 50, "SCORE " + this.pow2, style);
     this.p2ScoreLabel.anchor.set(1, 0);
-
     // this.game.time.events.add(2000, this.startGame , this);
     timer = this.game.time.create(false);
   },
@@ -60,7 +59,7 @@ GameScene.prototype = {
           } else if (this.turn == 2 && this.pow1 < this.pow2){
             this.turnText.setText("PLAYER 2 WON");
           } else {
-            this.turnText.setText("DRAW");
+            // this.turnText.setText("DRAW");
             this.newRound();
           }
       }
@@ -69,9 +68,9 @@ GameScene.prototype = {
 
   render: function () {
       if (timer.running) {
-          this.game.debug.text(Math.round(timer.duration / 1000)  , 2, 14, "#FF0044");
+          this.game.debug.text(Math.round(timer.duration / 1000)  , this.game.world.centerX,this.game.world.height - 40 , style);
       } else {
-          this.game.debug.text("Done!", 2, 14, "#0f0");
+          this.game.debug.text("Done!", 2, 14, style);
       }
   },
 
@@ -91,9 +90,9 @@ GameScene.prototype = {
     }
   },
 
-  endTimer: function() {
+  endTimer: function(skipSwitch) {
       timer.pause();
-      this.turn == 1 ? this.turn = 2 : this.turn = 1;
+      if(!skipSwitch)this.turn == 1 ? this.turn = 2 : this.turn = 1;
       switch (this.roundStatus) {
         case 'started':
             this.roundStatus = 'break';
@@ -124,10 +123,11 @@ GameScene.prototype = {
   },
 
   newRound: function(){
+    console.log("NEW ROUND");
     this.pow1 = 0;
     this.pow2 = 0;
     this.round++;
     this.roundStatus = 'started';
-    this.endTimer();
+    this.endTimer(true);
   }
 };
