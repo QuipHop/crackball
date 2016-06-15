@@ -28,26 +28,31 @@ GameScene.prototype = {
     this.p2.scale.setTo(3);
 
     this.turn = this.game.rnd.integerInRange(1, 2);
-    this.turnText = this.game.add.text(this.game.world.width / 2, 50, "PLAYER " + this.turn + " TURN \n PRESS SPACE TO START ", style);
+    this.turnText = this.game.add.text(this.game.world.width / 2, 50, "", style);
     this.turnText.anchor.set(0.5);
 
-    this.p1ScoreLabel = this.game.add.text(0, 50, "SCORE " + this.pow1, style);
-    this.p2ScoreLabel = this.game.add.text(this.game.world.width, 50, "SCORE " + this.pow2, style);
+    this.p1ScoreLabel = this.game.add.text(0, 50, "", style);
+    this.p2ScoreLabel = this.game.add.text(this.game.world.width, 50, "", style);
     this.p2ScoreLabel.anchor.set(1, 0);
 
+    this.animP1Hit = this.game.add.tween(this.p1).to({ x: 200 }, 100, Phaser.Easing.Quadratic.InOut, false);
     // this.game.time.events.add(2000, this.startGame , this);
     timer = this.game.time.create(false);
   },
 
   update: function(){
     //START ROUND SPACEBAR HANDLE
+    this.turnText.setText("PLAYER " + this.turn + " TURN \n PRESS SPACE TO START ");
     if(!this.gameStarted){
       if(this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)){
         this.startGame();
       }
     } else {
+      this.p1ScoreLabel.setText("SCORE " + this.pow1);
+      this.p2ScoreLabel.setText("SCORE " + this.pow2);
       this.turnText.setText("PLAYER " + this.turn + " TURN");
       if(this.roundStatus == 'break'){
+        // this.animP1Hit.start();
         this.turnText.setText("PLAYER " + this.turn + " TURN \n PRESS SPACEBAR TO START");
         if(this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)){
           this.resumeRound();
@@ -60,8 +65,10 @@ GameScene.prototype = {
           } else if (this.turn == 2 && this.pow1 < this.pow2){
             this.turnText.setText("PLAYER 2 WON");
           } else {
-            this.turnText.setText("DRAW");
-            this.newRound();
+            this.turnText.setText("ROUND " + (this.round+1));
+            if(this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)){
+              this.newRound();
+            }
           }
       }
     }
@@ -93,7 +100,7 @@ GameScene.prototype = {
 
   endTimer: function() {
       timer.pause();
-      this.turn == 1 ? this.turn = 2 : this.turn = 1;
+      this.switchTurn();
       switch (this.roundStatus) {
         case 'started':
             this.roundStatus = 'break';
@@ -107,15 +114,19 @@ GameScene.prototype = {
         case 'ended': break;
       }
       // this.roundStatus == 'started' ? this.roundStatus == 'break' ? this.roundStatus = 'resume' : this.roundStatus = 'ended';
-      console.log(this.roundStatus);
+      console.log(this.roundStatus, this.turn);
       if(this.roundStatus == 'started' || this.roundStatus == 'resume')timer.resume();
   },
 
+  switchTurn: function(){
+    this.turn == 1 ? this.turn = 2 : this.turn = 1;
+  },
+
   startGame: function(){
+    this.roundStatus = 'started';
     timer.loop(countDown, this.endTimer, this);
     timer.start();
     this.gameStarted = true;
-    this.roundStatus = 'started';
   },
 
   resumeRound: function(){
@@ -128,6 +139,8 @@ GameScene.prototype = {
     this.pow2 = 0;
     this.round++;
     this.roundStatus = 'started';
-    this.endTimer();
+    this.switchTurn();
+    timer.resume();
+    // this.endTimer();
   }
 };
