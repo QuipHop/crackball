@@ -3,7 +3,6 @@
 var BootScene = {
   init: function(){
     this.game.stage.smoothed = false;
-    this.game.stage.backgroundColor = '#00ff00'; 
   },
   preload: function () {
     // load here assets required for the loading screen
@@ -28,7 +27,7 @@ var PreloaderScene = {
   },
 
   create: function () {
-    this.game.state.start('play');
+    this.game.state.start('menu');
   }
 };
 

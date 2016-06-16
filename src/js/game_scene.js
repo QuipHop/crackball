@@ -1,8 +1,8 @@
 
-var style = { font: "4em comeback", fill: "#FF0044", align: "center" };
 
 var timer;
 var countDown = 5000;
+var style = { font: "4em comeback", fill: "#FF0044", align: "center" };
 
 var GameScene = function() {};
 
@@ -28,14 +28,14 @@ GameScene.prototype = {
     this.p2.scale.setTo(3);
 
     this.turn = this.game.rnd.integerInRange(1, 2);
-    this.turnText = this.game.add.text(this.game.world.width / 2, 70, "", style);
+    this.turnText = this.game.add.text(this.game.world.width / 2, 70, " ", style);
     this.turnText.anchor.set(0.5);
 
-    this.roundLabel = this.game.add.text(this.game.world.width / 2, 20, "", style);
+    this.roundLabel = this.game.add.text(this.game.world.width / 2, 20, " ", style);
     this.roundLabel.anchor.set(0.5);
 
-    this.p1ScoreLabel = this.game.add.text(0, 50, "", style);
-    this.p2ScoreLabel = this.game.add.text(this.game.world.width, 50, "", style);
+    this.p1ScoreLabel = this.game.add.text(0, 50, " ", style);
+    this.p2ScoreLabel = this.game.add.text(this.game.world.width, 50, " ", style);
     this.p2ScoreLabel.anchor.set(1, 0);
 
     this.p1HitAnim = this.game.add.tween(this.p1).to({ x: 200 }, 100, Phaser.Easing.Quadratic.InOut, false);
@@ -53,8 +53,8 @@ GameScene.prototype = {
 
   update: function(){
     //START ROUND SPACEBAR HANDLE
-    this.turnText.setText("PLAYER " + this.turn + " TURN \n PRESS SPACE TO START ");
     if(!this.gameStarted){
+      this.turnText.setText("PLAYER " + this.turn + " READY \n PRESS SPACE TO START ");
       if(this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)){
         this.startGame();
       }
@@ -111,9 +111,8 @@ GameScene.prototype = {
   },
 
   endTimer: function() {
-      this.playAttackAnimation();
       timer.pause();
-      this.switchTurn();
+
       switch (this.roundStatus) {
         case 'started':
             this.roundStatus = 'break';
@@ -126,6 +125,8 @@ GameScene.prototype = {
           break;
         case 'ended': break;
       }
+      this.playAttackAnimation();
+      this.switchTurn();
       console.log(this.roundStatus, this.turn);
       if(this.roundStatus == 'started' || this.roundStatus == 'resume')timer.resume();
   },
