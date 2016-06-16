@@ -1,10 +1,10 @@
-'use strict';
 
-var style = { font: "3em comeback", fill: "#FF0044", align: "center" };
+var style = { font: "4em comeback", fill: "#FF0044", align: "center" };
 
 var timer;
 var countDown = 5000;
-var GameScene = function(){};
+
+var GameScene = function() {};
 
 GameScene.prototype = {
   init: function(){
@@ -20,33 +20,51 @@ GameScene.prototype = {
 
   },
   create: function () {
-    this.p1 = this.game.add.sprite(300, 200, 'p1');
+    this.p1 = this.game.add.sprite(300, 250, 'p1');
     this.p1.anchor.setTo(0.5);
     this.p1.scale.setTo(3);
-    this.p2 = this.game.add.sprite(450, 200, 'p2');
+    this.p2 = this.game.add.sprite(450, 250, 'p2');
     this.p2.anchor.setTo(0.5);
     this.p2.scale.setTo(3);
 
     this.turn = this.game.rnd.integerInRange(1, 2);
-    this.turnText = this.game.add.text(this.game.world.width / 2, 50, "PLAYER " + this.turn + " TURN \n PRESS SPACE TO START ", style);
+    this.turnText = this.game.add.text(this.game.world.width / 2, 70, "", style);
     this.turnText.anchor.set(0.5);
 
-    this.p1ScoreLabel = this.game.add.text(0, 50, "SCORE " + this.pow1, style);
-    this.p2ScoreLabel = this.game.add.text(this.game.world.width, 50, "SCORE " + this.pow2, style);
+    this.roundLabel = this.game.add.text(this.game.world.width / 2, 20, "", style);
+    this.roundLabel.anchor.set(0.5);
+
+    this.p1ScoreLabel = this.game.add.text(0, 50, "", style);
+    this.p2ScoreLabel = this.game.add.text(this.game.world.width, 50, "", style);
     this.p2ScoreLabel.anchor.set(1, 0);
+
+    this.p1HitAnim = this.game.add.tween(this.p1).to({ x: 200 }, 100, Phaser.Easing.Quadratic.InOut, false);
+    this.p1HitAnim.onStart.addOnce(function(){
+      // console.log("STARTED");
+    }, this);
+    this.p1HitAnim.onComplete.addOnce(function(){
+      // console.log("COMPLETED");
+    }, this);
+    this.p1AttackAnim = this.game.add.tween(this.p1).to({ x: 400 }, 100, Phaser.Easing.Quadratic.InOut, false, 0,0, true);
+    this.p2AttackAnim = this.game.add.tween(this.p2).to({ x: 300 }, 100, Phaser.Easing.Quadratic.InOut, false, 0,0, true);
     // this.game.time.events.add(2000, this.startGame , this);
     timer = this.game.time.create(false);
   },
 
   update: function(){
     //START ROUND SPACEBAR HANDLE
+    this.turnText.setText("PLAYER " + this.turn + " TURN \n PRESS SPACE TO START ");
     if(!this.gameStarted){
       if(this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)){
         this.startGame();
       }
     } else {
+      this.roundLabel.setText("ROUND " + this.round);
+      this.p1ScoreLabel.setText("SCORE " + this.pow1);
+      this.p2ScoreLabel.setText("SCORE " + this.pow2);
       this.turnText.setText("PLAYER " + this.turn + " TURN");
       if(this.roundStatus == 'break'){
+        // this.p1HitAnim.start();
         this.turnText.setText("PLAYER " + this.turn + " TURN \n PRESS SPACEBAR TO START");
         if(this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)){
           this.resumeRound();
@@ -59,8 +77,9 @@ GameScene.prototype = {
           } else if (this.turn == 2 && this.pow1 < this.pow2){
             this.turnText.setText("PLAYER 2 WON");
           } else {
-            // this.turnText.setText("DRAW");
-            this.newRound();
+            if(this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)){
+              this.newRound();
+            }
           }
       }
     }
@@ -68,10 +87,11 @@ GameScene.prototype = {
 
   render: function () {
       if (timer.running) {
-          this.game.debug.text(Math.round(timer.duration / 1000)  , this.game.world.centerX,this.game.world.height - 40 , style);
-      } else {
-          this.game.debug.text("Done!", 2, 14, style);
+          this.game.debug.text(Math.round(timer.duration / 1000)  , 2, 14, "#FF0044");
       }
+      // else {
+      //     this.game.debug.text("Done!", 2, 14, "#0f0");
+      // }
   },
 
   getPower: function(){
@@ -90,9 +110,10 @@ GameScene.prototype = {
     }
   },
 
-  endTimer: function(skipSwitch) {
+  endTimer: function() {
+      this.playAttackAnimation();
       timer.pause();
-      if(!skipSwitch)this.turn == 1 ? this.turn = 2 : this.turn = 1;
+      this.switchTurn();
       switch (this.roundStatus) {
         case 'started':
             this.roundStatus = 'break';
@@ -105,16 +126,21 @@ GameScene.prototype = {
           break;
         case 'ended': break;
       }
-      // this.roundStatus == 'started' ? this.roundStatus == 'break' ? this.roundStatus = 'resume' : this.roundStatus = 'ended';
-      console.log(this.roundStatus);
+      console.log(this.roundStatus, this.turn);
       if(this.roundStatus == 'started' || this.roundStatus == 'resume')timer.resume();
   },
 
+  switchTurn: function(){
+    this.turn == 1 ? this.turn = 2 : this.turn = 1;
+  },
+  playAttackAnimation: function(){
+    this.turn == 1 ? this.p1AttackAnim.start() : this.p2AttackAnim.start();
+  },
   startGame: function(){
+    this.roundStatus = 'started';
     timer.loop(countDown, this.endTimer, this);
     timer.start();
     this.gameStarted = true;
-    this.roundStatus = 'started';
   },
 
   resumeRound: function(){
@@ -123,11 +149,12 @@ GameScene.prototype = {
   },
 
   newRound: function(){
-    console.log("NEW ROUND");
     this.pow1 = 0;
     this.pow2 = 0;
     this.round++;
     this.roundStatus = 'started';
-    this.endTimer(true);
+    this.switchTurn();
+    timer.resume();
+    // this.endTimer();
   }
 };
