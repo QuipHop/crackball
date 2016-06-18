@@ -19,10 +19,24 @@ var PreloaderScene = {
     this.loadingBar = this.game.add.sprite(0, 240, 'preloader_bar');
     this.loadingBar.anchor.setTo(0, 0.5);
     this.load.setPreloadSprite(this.loadingBar);
-    
-    this.game.load.audio('main_theme', ['audio/main_theme.mp3']);
+
+    this.game.load.audio('main_theme', ['audio/main_theme1.mp3']);
     this.game.load.spritesheet('p1', 'images/sprite_p1.png', 180, 240);
     this.game.load.spritesheet('p2', 'images/sprite_p2.png', 180, 240);
+    this.game.load.image('bg', 'images/pat.png');
+    this.game.load.image('bg_main', 'images/bg_main.png');
+    this.game.load.spritesheet('coin', 'images/coin.png', 192, 192);
+
+    this.game.load.audio('punch1', 'audio/punch1.mp3');
+    this.game.load.audio('punch3', 'audio/punch3.mp3');
+    this.game.load.audio('punch4', 'audio/punch4.mp3');
+
+    this.game.load.audio('hurt1', 'audio/hurt1.mp3');
+    this.game.load.audio('hurt2', 'audio/hurt2.mp3');
+    this.game.load.audio('hurt3', 'audio/hurt3.mp3');
+    this.game.load.audio('hurt4', 'audio/hurt4.mp3');
+    this.game.load.audio('heartbeat', 'audio/heartbeat.mp3');
+    this.game.load.audio('toss', 'audio/toss.mp3');
   },
 
   create: function () {
