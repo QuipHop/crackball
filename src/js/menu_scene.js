@@ -12,18 +12,18 @@ var MenuScene = {
 
     this.headerText = this.game.add.text(this.game.world.centerX, 30, 'CRACKBALL' , header_style);
     this.headerText.anchor.set(0.5, 0);
-    this.headerText.fontWeight = 'bold';
+    // this.headerText.fontWeight = 'bold';
     this.headerText.setShadow(0, 3, 'rgba(0,0,0,0.9)', 0);
 
     this.playBotBtn = this.game.add.text(this.game.world.centerX, this.game.world.centerY + 40, 'player vs bot', { font: "60px comeback", fill: "#ff002f", align: "center"});
     this.playBotBtn.anchor.set(0.5, 0);
-    this.playBotBtn.fontWeight = 'bold';
+    // this.playBotBtn.fontWeight = 'bold';
     this.playBotBtn.setShadow(-1, 1, 'rgba(0,0,0,0.9)', 0);
     this.playBotBtn.alpha = 0.7;
 
     this.playBtn = this.game.add.text(this.game.world.centerX, this.game.world.centerY-20, 'player vs player', { font: "60px comeback", fill: "#ff002f", align: "center"});
     this.playBtn.anchor.set(0.5, 0);
-    this.playBtn.fontWeight = 'bold';
+    // this.playBtn.fontWeight = 'bold';
     this.playBtn.setShadow(-1, 1, 'rgba(0,0,0,0.9)', 0);
 
     this.playBtn.inputEnabled = true;

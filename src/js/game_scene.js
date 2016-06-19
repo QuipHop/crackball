@@ -25,6 +25,7 @@ GameScene.prototype = {
     this.bg = this.game.add.image(this.game.world.centerX, this.game.world.centerY, 'bg_main');
     this.bg.anchor.setTo(0.5);
 
+    this.playersSpriteGroup = this.game.add.group();
     this.p1 = this.game.add.sprite(340, 250, 'p1');
     this.p1.anchor.setTo(0.5);
     this.coin = this.game.add.sprite(this.game.world.centerX, this.game.world.height - 90, 'coin');
@@ -37,7 +38,7 @@ GameScene.prototype = {
     this.p2 = this.game.add.sprite(430, 250, 'p2');
     this.p2.anchor.setTo(0.5);
     this.p2.scale.setTo(1.2);
-
+    this.playersSpriteGroup.addMultiple([this.p1, this.p2]);
     this.turn = this.game.rnd.integerInRange(1, 2);
     this.turnText = this.game.add.text(this.game.world.centerX, 90, " ", style);
     this.turnText.anchor.setTo(0.5);
@@ -60,6 +61,48 @@ GameScene.prototype = {
     this.p1ScoreLabel.setShadow(0, 3, '#FF0044', 0);
     this.p2ScoreLabel.anchor.setTo(1, 0);
 
+    this.menuModalGroup = this.game.add.group();
+    var graphics = this.game.add.graphics(0, 0);
+    graphics.beginFill("#FFF", 0.5);
+    graphics.drawRect(0, 0, this.game.world.width,  this.game.world.height);
+
+    this.inputMenuGroup = this.game.add.group();
+    this.repeatBtn = this.game.add.text(this.game.world.centerX, this.game.world.centerY - 60, 'PLAY AGAIN', { font: "60px comeback", fill: "#ff002f", align: "center"});
+    this.repeatBtn.action = 'repeat';
+
+    this.exitBtn = this.game.add.text(this.game.world.centerX, this.game.world.centerY + 20, 'Return to Menu', { font: "60px comeback", fill: "#ff002f", align: "center"});
+    this.exitBtn.action = 'exit';
+
+    this.inputMenuGroup.addMultiple([this.repeatBtn, this.exitBtn]);
+    this.inputMenuGroup.forEach(function(item){
+      // item.fontWeight = 'bold';
+      item.setShadow(-1, 1, 'rgba(0,0,0,0.9)', 0);
+      item.anchor.set(0.5, 0);
+    });
+    this.inputMenuGroup.setAll('inputEnabled', true);
+    this.inputMenuGroup.setAll('input.useHandCursor', true);
+
+    this.inputMenuGroup.callAll('events.onInputDown.add', 'events.onInputDown', function(input){
+      switch (input.action) {
+        case 'repeat':
+          this.game.state.start('play');
+          break;
+          case 'exit':
+            this.game.state.start('menu');
+          break;
+      }
+    }, this);
+    this.inputMenuGroup.callAll('events.onInputOver.add', 'events.onInputOver', function(input){
+      input.fill = "#FFF";
+    }, this);
+    this.inputMenuGroup.callAll('events.onInputOut.add', 'events.onInputOut', function(input){
+      input.fill = "#ff002f";
+    }, this);
+
+    this.menuModalGroup.addMultiple([graphics, this.inputMenuGroup]);
+    this.menuModalGroup.visible = false;
+    this.menuModalGroup.alpha = 0;
+
     this.initAnimations();
     this.puchSounds = [
       this.game.add.audio('punch1'),
@@ -68,13 +111,19 @@ GameScene.prototype = {
     ];
     this.hurtSounds = [
       this.game.add.audio('hurt1'),
+      this.game.add.audio('hurt5'),
       this.game.add.audio('hurt3'),
       this.game.add.audio('hurt4')
     ];
-
+    this.replySounds = [
+      this.game.add.audio('rep1'),
+      this.game.add.audio('rep2'),
+      this.game.add.audio('rep3'),
+      this.game.add.audio('rep4'),
+      this.game.add.audio('rep5')
+    ];
     this.heartSound = this.game.add.audio('heartbeat');
     this.tossSound = this.game.add.audio('toss');
-
     this.heartSound.override = true;
 
     this.game.world.bringToTop(this.coin);
@@ -98,6 +147,7 @@ GameScene.prototype = {
         this.turnText._text = "PLAYER " + this.turn + " READY \n PUSH SPACEBAR!"
         if(this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)){
           this.coin.destroy();
+          this.playSound('reply');
           this.startGame();
         }
       }
@@ -109,6 +159,7 @@ GameScene.prototype = {
       if(this.roundStatus == 'break'){
         this.turnText._text = "PLAYER " + this.turn + " GET UP! \n PUSH SPACEBAR!";
         if(this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) && this.tweenComplete){
+          this.playSound('reply');
           this.resumeRound();
         }
       }
@@ -125,6 +176,7 @@ GameScene.prototype = {
             this.p1ScoreLabel.setText('');
             this.p2ScoreLabel.setText('');
             if(this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) && this.tweenComplete){
+              this.playSound('reply');
               this.newRound();
             }
           }
@@ -221,16 +273,9 @@ GameScene.prototype = {
   },
 
   initAnimations: function(){
-    // this.p1HitAnim = this.game.add.tween(this.p1).to({ x: 200 }, 250, 'Linear', false);
-    // this.p1HitAnim.onStart.add(function(){
-    //
-    // }, this);
-    // this.p1HitAnim.onComplete.add(function(){
-    //   this.p1.frame = 1;
-    // }, this);
-
-    this.p1AttackAnim = this.game.add.tween(this.p1).to({ x: this.p2.x }, 250, 'Linear', false, 0,0, true);
+    this.p1AttackAnim = this.game.add.tween(this.p1).to({ x: this.p2.x - 30}, 250, Phaser.Easing.Quadratic.Out, false, 0,0, true);
     this.p1AttackAnim.onStart.add(function(){
+      this.playersSpriteGroup.bringToTop(this.p1);
       this.p1.frame = 2;
       this.tweenComplete = false;
     }, this);
@@ -245,9 +290,10 @@ GameScene.prototype = {
       this.tweenComplete = true;
     }, this);
 
-    this.p2AttackAnim = this.game.add.tween(this.p2).to({ x: this.p1.x }, 250, 'Linear', false, 0,0, true);
+    this.p2AttackAnim = this.game.add.tween(this.p2).to({ x: this.p1.x + 30 }, 250, Phaser.Easing.Quadratic.Out, false, 0,0, true);
 
     this.p2AttackAnim.onStart.add(function(){
+      this.playersSpriteGroup.bringToTop(this.p2);
       this.tweenComplete = false;
       this.p2.frame = 2;
     }, this);
@@ -264,22 +310,29 @@ GameScene.prototype = {
     }, this);
 
     this.p1DeathTween = this.game.add.tween(this.p1).to({x: this.p1.x - 90, angle: '-90', y: this.p1.y + this.p1._frame.width / 2}, 450, Phaser.Easing.Bounce.Out);
-    this.p1DeathTween.onStart.add(function(){
-      //playSound
+    this.p1DeathTween.onStart.addOnce(function(){
+      this.playSound('hurt');
     }, this);
-    this.p1DeathTween.onComplete.add(function(){
-      //playSound
+    this.p1DeathTween.onComplete.addOnce(function(){
       this.p1.frame = 3;
+      this.menuModalGroup.visible = true;
+      this.inputMenuGroupTween.start();
     }, this);
 
     this.p2DeathTween = this.game.add.tween(this.p2).to({x: this.p2.x + 90, angle: '+90', y: this.p2.y + this.p2._frame.width / 2}, 450, Phaser.Easing.Bounce.Out);
-    this.p2DeathTween.onStart.add(function(){
-      //playSound
+    this.p2DeathTween.onStart.addOnce(function(){
+      this.playSound('hurt');
     }, this);
     this.p2DeathTween.onComplete.add(function(){
-      //playSound
       this.p2.frame = 3;
+      this.menuModalGroup.visible = true;
+      this.inputMenuGroupTween.start();
     },this);
+
+    this.inputMenuGroupTween = this.game.add.tween(this.menuModalGroup).to({alpha: 1}, 300, 'Linear');
+    this.inputMenuGroupTween.onStart.addOnce(function(){
+      this.playSound('reply');
+    }, this);
   },
 
   playSound: function(which){
@@ -292,6 +345,9 @@ GameScene.prototype = {
         break;
       case 'heartbeat':
         this.heartSound.play();
+        break;
+      case 'reply':
+        this.replySounds[this.game.rnd.integerInRange(0, this.replySounds.length-1)].play();
         break;
       case 'toss':
         this.tossSound.play();

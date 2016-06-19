@@ -35,6 +35,14 @@ var PreloaderScene = {
     this.game.load.audio('hurt2', 'audio/hurt2.mp3');
     this.game.load.audio('hurt3', 'audio/hurt3.mp3');
     this.game.load.audio('hurt4', 'audio/hurt4.mp3');
+    this.game.load.audio('hurt5', 'audio/hurt5.mp3');
+
+    this.game.load.audio('rep1', 'audio/rep1.mp3');
+    this.game.load.audio('rep2', 'audio/rep2.mp3');
+    this.game.load.audio('rep3', 'audio/rep3.mp3');
+    this.game.load.audio('rep4', 'audio/rep4.mp3');
+    this.game.load.audio('rep5', 'audio/rep5.mp3');
+
     this.game.load.audio('heartbeat', 'audio/heartbeat.mp3');
     this.game.load.audio('toss', 'audio/toss.mp3');
   },
