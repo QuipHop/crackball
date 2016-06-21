@@ -21,8 +21,8 @@ var PreloaderScene = {
     this.load.setPreloadSprite(this.loadingBar);
 
     this.game.load.audio('main_theme', ['audio/main_theme1.mp3']);
-    this.game.load.spritesheet('p1', 'images/sprite_p1.png', 180, 240);
-    this.game.load.spritesheet('p2', 'images/sprite_p2.png', 180, 240);
+    this.game.load.spritesheet('p1', 'images/sprite_p1.png', 150, 240);
+    this.game.load.spritesheet('p2', 'images/sprite_p2.png', 150, 240);
     this.game.load.image('bg', 'images/pat.png');
     this.game.load.image('bg_main', 'images/bg_main.png');
     this.game.load.spritesheet('coin', 'images/coin.png', 192, 192);
