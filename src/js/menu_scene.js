@@ -38,7 +38,8 @@ var MenuScene = {
         });
 
         this.btnGroup.callAll('events.onInputDown.add', 'events.onInputDown', function(input) {
-            this.music.stop();
+            this.music.restart();
+            this.music.volume = .1;
             this.game.state.start('play', false, true, input.isBot);
         }, this);
         this.btnGroup.callAll('events.onInputOver.add', 'events.onInputOver', function(input) {
@@ -48,8 +49,9 @@ var MenuScene = {
             input.fill = "#ff002f";
         }, this);
 
-
         this.music = this.game.add.audio('main_theme');
+        this.music.loop = true;
+        this.music.volume = .5;
         this.music.play();
     }
 };
