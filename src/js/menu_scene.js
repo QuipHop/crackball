@@ -39,7 +39,7 @@ var MenuScene = {
 
         this.btnGroup.callAll('events.onInputDown.add', 'events.onInputDown', function(input) {
             this.music.stop();
-            this.game.state.start('play', false, true, input.isBot);
+            this.game.state.start('play', true, false, input.isBot);
         }, this);
         this.btnGroup.callAll('events.onInputOver.add', 'events.onInputOver', function(input) {
             input.fill = "#FFF";
