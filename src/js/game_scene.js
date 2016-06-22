@@ -103,7 +103,7 @@ GameScene.prototype = {
         this.inputMenuGroup.callAll('events.onInputDown.add', 'events.onInputDown', function(input) {
             switch (input.action) {
                 case 'repeat':
-                    this.game.state.start('play', false, true, this.isBot);
+                    this.game.state.restart(true, false, this.isBot);
                     break;
                 case 'exit':
                     this.game.state.start('menu');
