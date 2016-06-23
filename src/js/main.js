@@ -58,6 +58,6 @@ window.onload = function () {
   game.state.add('preloader', PreloaderScene);
   game.state.add('menu', MenuScene);
   game.state.add('play', GameScene);
-
   game.state.start('boot');
+  
 };

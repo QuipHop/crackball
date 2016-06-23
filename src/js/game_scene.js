@@ -20,6 +20,7 @@ var menu_btn_style = {
     fill: "#ff002f",
     align: "center"
 };
+var textMargin = 160;
 var GameScene = function() {};
 
 GameScene.prototype = {
@@ -35,6 +36,7 @@ GameScene.prototype = {
     },
 
     create: function() {
+        console.log("MU,", music);
         this.powKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         this.powKey.onDown.add(this.getPower, this);
 
@@ -55,14 +57,23 @@ GameScene.prototype = {
         this.p2 = this.game.add.sprite(440, 250, 'p2');
         this.p2.anchor.setTo(0.5);
         this.p2.scale.setTo(1.2);
-        this.p2.name = this.isBot ? 'BOT' : 'PLAYER 2';
         this.p2.isBot = this.isBot;
+        this.p2.name = this.p2.isBot ? 'BOT' : 'PLAYER 2';
         this.playersSpriteGroup.addMultiple([this.p1, this.p2]);
+        
         this.turn = this.game.rnd.integerInRange(1, 2);
         this.turnText = this.game.add.text(this.game.world.centerX, 90, " ", style);
         this.turnText.anchor.setTo(0.5);
         this.turnText.setShadow(0, 3, 'rgba(0,0,0,0.9)', 0);
         this.turnText.lineSpacing = -10;
+
+        this.pushText = this.game.add.text(0, 0, "PUSH\nSPACEBAR!", score_style);
+        this.pushText.anchor.setTo(0.5);
+        this.pushText.alpha = 0;
+        this.pushText.setShadow(0, 3, 'rgba(0,0,0,0.9)', 0);
+        this.pushText.tween = this.game.add.tween(this.pushText).to({fontSize : 60}, 400, Phaser.Easing.Quadratic.In, true);
+        this.pushText.tween.loop(true);
+        this.placePushText();
 
         this.countDownLabel = this.game.add.text(this.game.world.centerX, 70, " ", cd_style);
         this.countDownLabel.anchor.setTo(0.5);
@@ -155,6 +166,7 @@ GameScene.prototype = {
         this.coinTossTween.onComplete.addOnce(function() {
             this.cointoss.stop();
             this.turn == 1 ? this.coin.frame = 2 : this.coin.frame = 0;
+            this.pushText.alpha = 1;
             this.tweenComplete = true;
         }, this);
         this.coinTossTween.start();
@@ -162,10 +174,10 @@ GameScene.prototype = {
     },
 
     update: function() {
-        //START ROUND SPACEBAR HANDLE
+        //START ROUND SPACEBAR HANDLER
         if (!this.gameStarted) {
             if (this.tweenComplete) {
-                this.turnText._text = this['p' + this.turn].name + " READY"
+                this.turnText._text = this['p' + this.turn].name + " READY";
                 if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
                     this.coin.destroy();
                     this.playSound('reply');
@@ -173,6 +185,10 @@ GameScene.prototype = {
                 }
             }
         } else {
+            //GAME STARTED
+            this.roundLabel._text = "ROUND " + this.round;
+            this.p1ScoreLabel._text = "POWER " + this.pow1;
+            this.p2ScoreLabel._text = "POWER " + this.pow2;
             if (this['p' + this.turn].isBot && timer.running && !timer.paused) {
                 if (this.game.time.now - this.botTick > 100) {
                     if (this.game.rnd.integerInRange(1, 10) >= 5) {
@@ -182,13 +198,10 @@ GameScene.prototype = {
                     this.botTick = this.game.time.now;
                 }
             }
-            this.roundLabel._text = "ROUND " + this.round;
-            this.p1ScoreLabel._text = "POWER " + this.pow1;
-            this.p2ScoreLabel._text = "POWER " + this.pow2;
-            this.turnText._text = this['p' + this.turn].name + " TURN";
+
             if (this.roundStatus == 'break') {
                 this.turnText._text = this['p' + this.turn].name + " GET UP!";
-                if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) && this.tweenComplete) {
+                if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) && this.tweenComplete || this['p' + this.turn].isBot){
                     this.playSound('reply');
                     this.resumeRound();
                 }
@@ -199,13 +212,15 @@ GameScene.prototype = {
                     this.turnText._text = this.p1.name + " WIN";
                     this.p2DeathTween.start();
                 } else if (this.turn == 2 && this.pow1 < this.pow2) {
-                    this.turnText._text = this.p1.name + " WIN";
+                    this.turnText._text = this.p2.name + " WIN";
                     this.p1DeathTween.start();
                 } else {
+                    //THESE VALUES ARE 'PREDICTED'
                     this.roundLabel._text = "ROUND " + (this.round + 1);
+                    this.turnText._text = (this.turn == 1 ? this.p2.name : this.p1.name) + " TURN";
                     this.p1ScoreLabel.setText('');
                     this.p2ScoreLabel.setText('');
-                    if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) && this.tweenComplete) {
+                    if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) && this.tweenComplete || !this['p' + this.turn].isBot) {
                         this.playSound('reply');
                         this.newRound();
                     }
@@ -256,6 +271,11 @@ GameScene.prototype = {
 
     switchTurn: function() {
         this.turn == 1 ? this.turn = 2 : this.turn = 1;
+        if(this.roundStatus != 'ended' && !this['p' + this.turn].isBot){
+            this.pushText.reset(this.turn == 1 ? textMargin : this.game.world.width-textMargin, this.world.centerY + 40);
+        } else {
+            this.pushText.alpha = 0;
+        }
     },
     playAttackAnimation: function() {
         if (this.roundStatus != 'resume') {
@@ -391,6 +411,8 @@ GameScene.prototype = {
             alpha: 1
         }, 300, 'Linear');
         this.inputMenuGroupTween.onStart.addOnce(function() {
+            this.pushText.alpha = 0;
+            this.world.bringToTop(this.turnText);
             this.playSound('reply');
         }, this);
     },
@@ -412,6 +434,14 @@ GameScene.prototype = {
             case 'toss':
                 this.tossSound.play();
                 break;
+        }
+    },
+
+    placePushText: function(){
+        if(this.isBot){
+            this.pushText.reset(textMargin, this.world.centerY + 40);
+        } else {
+            this.pushText.reset(this.turn == 1 ? textMargin : this.game.world.width - textMargin, this.world.centerY + 40 );
         }
     }
 };
