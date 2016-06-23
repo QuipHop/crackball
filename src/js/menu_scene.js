@@ -12,7 +12,7 @@ var btn_style = {
     align: "center"
 };
 var music;
-var margin = 50;
+var margin = 70;
 var MenuScene = {
     create: function() {
         this.game.stage.backgroundColor = '#fbd000';
@@ -25,7 +25,7 @@ var MenuScene = {
         // this.headerText.fontWeight = 'bold';
         this.headerText.setShadow(0, 5, 'rgba(255,255,255,.9)', 0);
         this.headerText.type = 'label';
-        this.playBtn = this.game.add.text(this.game.world.centerX, this.game.world.centerY - margin, ' player vs player ', btn_style);
+        this.playBtn = this.game.add.text(this.game.world.centerX, this.game.world.centerY - margin / 2, ' player vs player ', btn_style);
         this.btnGroup = this.game.add.group();
         this.playBotBtn = this.game.add.text(this.game.world.centerX, this.playBtn.y + margin , ' player vs bot ', btn_style);
         this.playBotBtn.isBot = true;
@@ -39,14 +39,14 @@ var MenuScene = {
             item.anchor.set(0.5, 0);
             item.setShadow(0, 5, 'rgba(255,255,255, .9)', 0);
             item.inputEnabled = true;
-            item.input.useHandCursor = true; 
+            item.input.useHandCursor = true;
             }
         });
 
         this.btnGroup.callAll('events.onInputDown.add', 'events.onInputDown', function(input) {
             if(input.action == 'about'){
                 this.btnGroup.visible = false;
-                this.aboutGroup.visible = true; 
+                this.aboutGroup.visible = true;
             } else if (input.action == 'back'){
                 this.btnGroup.visible = true;
                 this.aboutGroup.visible = false;
@@ -65,7 +65,7 @@ var MenuScene = {
         }, this);
 
         this.aboutGroup = this.game.add.group();
-        this.aboutText = this.playBtn = this.game.add.text(this.game.world.centerX, 20 , ' About: \n Code & Art: QUIPHOP \n Art: FASON \n Music: Pleasure Toys – Px \n\n  quiphop prod. 2016', btn_style);
+        this.aboutText = this.playBtn = this.game.add.text(this.game.world.centerX, 20 , ' ABOUT: \n ART: FASON & QUIPHOP \n CODE: QUIPHOP \n MUSIC: Pleasure Toys – Px \n\n  quiphop prod. 2016', btn_style);
         this.aboutGroup.addMultiple([this.aboutText, this.backBtn]);
         this.aboutGroup.forEach(function (item) {
             item.anchor.set(0.5, 0);
