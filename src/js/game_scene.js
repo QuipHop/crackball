@@ -36,7 +36,6 @@ GameScene.prototype = {
     },
 
     create: function() {
-        console.log("MU,", music);
         this.powKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         this.powKey.onDown.add(this.getPower, this);
 
@@ -110,13 +109,13 @@ GameScene.prototype = {
         });
         this.inputMenuGroup.setAll('inputEnabled', true);
         this.inputMenuGroup.setAll('input.useHandCursor', true);
-
         this.inputMenuGroup.callAll('events.onInputDown.add', 'events.onInputDown', function(input) {
             switch (input.action) {
                 case 'repeat':
                     this.game.state.restart(true, false, this.isBot);
                     break;
                 case 'exit':
+                    music.restart('', 0, .1, true);
                     this.game.state.start('menu');
                     break;
             }
@@ -163,7 +162,7 @@ GameScene.prototype = {
         this.coinTossTween.onStart.add(function() {
             this.playSound('toss');
         }, this);
-        this.coinTossTween.onComplete.addOnce(function() {
+        this.coinTossTween.onComplete.addOnce(function(){
             this.cointoss.stop();
             this.turn == 1 ? this.coin.frame = 2 : this.coin.frame = 0;
             this.pushText.alpha = 1;
@@ -190,6 +189,7 @@ GameScene.prototype = {
             this.p1ScoreLabel._text = "POWER " + this.pow1;
             this.p2ScoreLabel._text = "POWER " + this.pow2;
             if (this['p' + this.turn].isBot && timer.running && !timer.paused) {
+                this.pushText.alpha = 0;
                 if (this.game.time.now - this.botTick > 100) {
                     if (this.game.rnd.integerInRange(1, 10) >= 5) {
                         this.pow2++;
@@ -220,6 +220,7 @@ GameScene.prototype = {
                     this.turnText._text = (this.turn == 1 ? this.p2.name : this.p1.name) + " TURN";
                     this.p1ScoreLabel.setText('');
                     this.p2ScoreLabel.setText('');
+                    this.pushText.visible = !this['p' + this.turn].isBot ? true : false;
                     if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) && this.tweenComplete || !this['p' + this.turn].isBot) {
                         this.playSound('reply');
                         this.newRound();
@@ -272,6 +273,7 @@ GameScene.prototype = {
     switchTurn: function() {
         this.turn == 1 ? this.turn = 2 : this.turn = 1;
         if(this.roundStatus != 'ended' && !this['p' + this.turn].isBot){
+            this.pushText.alpha = 1 ;
             this.pushText.reset(this.turn == 1 ? textMargin : this.game.world.width-textMargin, this.world.centerY + 40);
         } else {
             this.pushText.alpha = 0;

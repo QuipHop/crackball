@@ -20,10 +20,10 @@ var MenuScene = {
         this.bg = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'bg');
         this.bg.autoScroll(0, -50);
 
-        this.headerText = this.game.add.text(this.game.world.centerX, 30, ' CRACKBALL ', header_style);
+        this.headerText = this.game.add.text(this.game.world.centerX, 20, ' CRACKBALL ', header_style);
         this.headerText.anchor.set(0.5, 0);
         // this.headerText.fontWeight = 'bold';
-        this.headerText.setShadow(0, 3, 'rgba(255,255,255,.9)', 0);
+        this.headerText.setShadow(0, 5, 'rgba(255,255,255,.9)', 0);
         this.headerText.type = 'label';
         this.playBtn = this.game.add.text(this.game.world.centerX, this.game.world.centerY - margin, ' player vs player ', btn_style);
         this.btnGroup = this.game.add.group();
@@ -37,7 +37,7 @@ var MenuScene = {
         this.btnGroup.forEach(function (item) {
             if(item.type != 'label'){
             item.anchor.set(0.5, 0);
-            item.setShadow(-1, 1, 'rgba(255,255,255, .9)', 0);
+            item.setShadow(0, 5, 'rgba(255,255,255, .9)', 0);
             item.inputEnabled = true;
             item.input.useHandCursor = true; 
             }
@@ -57,9 +57,11 @@ var MenuScene = {
         }, this);
         this.btnGroup.callAll('events.onInputOver.add', 'events.onInputOver', function(input) {
             input.fill = "#FFF";
+            input.setShadow(0, 5, 'rgba(0,0,0, .9)', 0);
         }, this);
         this.btnGroup.callAll('events.onInputOut.add', 'events.onInputOut', function(input) {
             input.fill = "#ff002f";
+            input.setShadow(0, 5, 'rgba(255,255,255, .9)', 0);
         }, this);
 
         this.aboutGroup = this.game.add.group();
@@ -67,7 +69,7 @@ var MenuScene = {
         this.aboutGroup.addMultiple([this.aboutText, this.backBtn]);
         this.aboutGroup.forEach(function (item) {
             item.anchor.set(0.5, 0);
-            item.setShadow(-1, 1, 'rgba(255,255,255, .9)', 0);
+            item.setShadow(0, 5, 'rgba(255,255,255, .9)', 0);
         });
         this.aboutGroup.visible = false;
         music = this.game.add.audio('main_theme');
