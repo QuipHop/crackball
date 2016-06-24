@@ -1,4 +1,5 @@
 'use strict';
+var music;
 
 var BootScene = {
     init: function() {
@@ -48,6 +49,9 @@ var PreloaderScene = {
     },
 
     create: function() {
+        music = this.game.add.audio('main_theme');
+        music.loop = true;
+        music.volume = .5;
         this.game.state.start('menu');
     }
 };
@@ -59,5 +63,4 @@ window.onload = function() {
     game.state.add('menu', MenuScene);
     game.state.add('play', GameScene);
     game.state.start('boot');
-
 };

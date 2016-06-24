@@ -11,7 +11,6 @@ var btn_style = {
     fill: "#ff002f",
     align: "center"
 };
-var music;
 var margin = 70;
 var MenuScene = {
     create: function() {
@@ -72,9 +71,6 @@ var MenuScene = {
             item.setShadow(0, 5, 'rgba(255,255,255, .9)', 0);
         });
         this.aboutGroup.visible = false;
-        music = this.game.add.audio('main_theme');
-        music.loop = true;
-        music.volume = .5;
         music.play();
     }
 };
