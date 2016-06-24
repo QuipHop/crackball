@@ -402,6 +402,8 @@ GameScene.prototype = {
             y: this.p1.y + this.p1._frame.width / 2 + 20
         }, 450, Phaser.Easing.Bounce.Out);
         this.p1DeathTween.onStart.addOnce(function() {
+            this.gameStatus.prev = this.gameStatus.cur;
+            this.gameStatus.cur = 'pause';
             this.resumeBtn.visible = false;
             this.playSound('hurt');
         }, this);
@@ -418,6 +420,8 @@ GameScene.prototype = {
             y: this.p2.y + this.p2._frame.width / 2 + 20
         }, 450, Phaser.Easing.Bounce.Out);
         this.p2DeathTween.onStart.addOnce(function() {
+            this.gameStatus.prev = this.gameStatus.cur;
+            this.gameStatus.cur = 'pause';
             this.resumeBtn.visible = false;
             this.playSound('hurt');
         }, this);
