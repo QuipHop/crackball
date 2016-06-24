@@ -4,6 +4,12 @@ var music;
 var BootScene = {
     init: function() {
         this.game.stage.smoothed = false;
+        this.game.stage.disableVisibilityChange = true;
+        this.game.scale.fullScreenScaleMode = Phaser.ScaleManager.SHOW_ALL;
+        this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+        this.game.input.keyboard.addKeyCapture([
+            Phaser.Keyboard.SPACEBAR
+        ]);
     },
     preload: function() {
         // load here assets required for the loading screen
