@@ -129,10 +129,11 @@ GameScene.prototype = {
                     this.tweenComplete = true;
                     this.menuModalGroup.visible = false;
                     this.menuModalGroup.alpha = 0;
+                    this.pushText.alpha = 1;
                     this.gameStatus.cur = this.gameStatus.prev;
                     break;
                 case 'exit':
-                    music.restart('', 0, .1, true);
+                    music.restart('', 0, .5, true);
                     this.game.state.start('menu');
                     break;
             }
@@ -195,7 +196,6 @@ GameScene.prototype = {
             if (this.roundStatus == 'break') {
                 this.turnText._text = this['p' + this.turn].name + " GET UP!";
                 if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) && this.tweenComplete || this['p' + this.turn].isBot){
-                    this.playSound('reply');
                     this.resumeRound();
                 }
             }
@@ -215,7 +215,6 @@ GameScene.prototype = {
                     this.p2ScoreLabel.setText('');
                     this.pushText.alpha = this['p' + this.turn].isBot ? true : false;
                     if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) || !this['p' + this.turn].isBot) {
-                        this.playSound('reply');
                         this.newRound();
                     }
                 }
@@ -290,16 +289,20 @@ GameScene.prototype = {
 
     resumeRound: function() {
         this.roundStatus = 'resume';
+        this.playSound('reply');
         timer.resume();
     },
 
     newRound: function() {
+        this.roundStatus = 'started';
         this.pow1 = 0;
         this.pow2 = 0;
         this.round++;
-        this.roundStatus = 'started';
         this.switchTurn();
-        timer.resume();
+        this.playSound('reply');
+        this.game.time.events.add(Phaser.Timer.SECOND * 2, function(){
+            timer.resume();
+        }, this);
     },
 
     renderLabels: function() {
@@ -428,7 +431,7 @@ GameScene.prototype = {
         this.inputMenuGroupTween = this.game.add.tween(this.menuModalGroup).to({
             alpha: 1
         }, 300, 'Linear');
-        this.inputMenuGroupTween.onStart.addOnce(function() {
+        this.inputMenuGroupTween.onStart.add(function() {
             this.pushText.alpha = 0;
             this.playSound('reply');
         }, this);
